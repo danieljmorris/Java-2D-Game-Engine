@@ -18,6 +18,8 @@ public class Window {
 	private int width, height;
 	private String title;
 	private long glfwWindow;
+	private float r, g, b, a;
+	private boolean fadeToBlack = false;
 	
 	private static Window window = null;
 	
@@ -25,6 +27,10 @@ public class Window {
 		this.width = 1920;
 		this.height = 1080;
 		this.title = "Mario";
+		r = 1;
+		b = 1;
+		g = 1;
+		a = 1;
 	}
 
 	public static Window get() {
@@ -39,6 +45,14 @@ public class Window {
 		
 		init();
 		loop();
+		
+		//free the memory
+		glfwFreeCallbacks(glfwWindow);
+		glfwDestroyWindow(glfwWindow);
+		//terminate GLFW and free the error callback
+		glfwTerminate();
+		glfwSetErrorCallback(null).free();
+		
 	}
 	
 	public void init() {
@@ -58,6 +72,10 @@ public class Window {
 		if(glfwWindow == NULL) {
 			throw new IllegalStateException("Failed to create glfw window");
 		}
+		glfwSetCursorPosCallback(glfwWindow, MouseListener::mousePosCallback);
+		glfwSetMouseButtonCallback(glfwWindow, MouseListener::mouseButtonCallback);
+		glfwSetScrollCallback(glfwWindow, MouseListener::mouseScrollCallback);
+		glfwSetKeyCallback(glfwWindow, KeyListener::keyCallback);
 		//make OpenGl context current
 		glfwMakeContextCurrent(glfwWindow);
 		//enable v-sync
@@ -73,8 +91,16 @@ public class Window {
 		while(!glfwWindowShouldClose(glfwWindow)) {
 			//poll events
 			glfwPollEvents();
-			glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
+			glClearColor(r, g, b, a);
 			glClear(GL_COLOR_BUFFER_BIT);
+			if(fadeToBlack) {
+				r = Math.max(r -= 0.01f, 0);
+				g = Math.max(g -= 0.01f, 0);
+				b = Math.max(b -= 0.01f, 0);
+			}
+			if(KeyListener.isKeyPressed(GLFW_KEY_SPACE)) {
+				fadeToBlack = true;
+			}
 			glfwSwapBuffers(glfwWindow);
 		}
 	}
