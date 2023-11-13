@@ -6,21 +6,15 @@ import static org.lwjgl.opengl.GL20.GL_FRAGMENT_SHADER;
 import static org.lwjgl.opengl.GL20.GL_INFO_LOG_LENGTH;
 import static org.lwjgl.opengl.GL20.GL_LINK_STATUS;
 import static org.lwjgl.opengl.GL20.GL_VERTEX_SHADER;
-import static org.lwjgl.opengl.GL20.glAttachShader;
-import static org.lwjgl.opengl.GL20.glCompileShader;
-import static org.lwjgl.opengl.GL20.glCreateProgram;
-import static org.lwjgl.opengl.GL20.glCreateShader;
-import static org.lwjgl.opengl.GL20.glGetProgramInfoLog;
-import static org.lwjgl.opengl.GL20.glGetProgrami;
-import static org.lwjgl.opengl.GL20.glGetShaderInfoLog;
-import static org.lwjgl.opengl.GL20.glGetShaderi;
-import static org.lwjgl.opengl.GL20.glLinkProgram;
-import static org.lwjgl.opengl.GL20.glShaderSource;
-import static org.lwjgl.opengl.GL20.glUseProgram;
+import static org.lwjgl.opengl.GL20.*;
 
 import java.io.IOException;
+import java.nio.FloatBuffer;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+
+import org.joml.Matrix4f;
+import org.lwjgl.BufferUtils;
 
 public class Shader {
 
@@ -131,6 +125,13 @@ public class Shader {
 
 	public void detach() {
 		glUseProgram(0);
+	}
+	
+	public void uploadMat4f(String varName, Matrix4f mat4) {
+		int varLocation = glGetUniformLocation(shaderProgramID, varName);
+		FloatBuffer matBuffer = BufferUtils.createFloatBuffer(16);
+		mat4.get(matBuffer);
+		glUniformMatrix4fv(varLocation, false, matBuffer);
 	}
 
 }
