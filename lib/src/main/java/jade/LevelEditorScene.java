@@ -11,6 +11,7 @@ import org.joml.Vector2f;
 import org.lwjgl.BufferUtils;
 
 import renderer.Shader;
+import util.Time;
 
 public class LevelEditorScene extends Scene {
 
@@ -87,10 +88,12 @@ public class LevelEditorScene extends Scene {
 
 	@Override
 	public void update(float dt) {
-		camera.position.x -= dt * 50.0f;
+		camera.position.x -= dt * 5.0f;
+		camera.position.y -= dt * 5.0f;
 		defaultShader.use();
 		defaultShader.uploadMat4f("uProjection", camera.getProjectionMatrix());
 		defaultShader.uploadMat4f("uView", camera.getViewMatrix());
+		defaultShader.uploadFloat("uTime", Time.getTime());
 		//bind the vao
 		glBindVertexArray(vaoID);
 		//enable vertex attribute pointers
